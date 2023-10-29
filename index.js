@@ -26,6 +26,7 @@ async function run() {
     await client.connect();
 
     const productCollection = client.db('productDB').collection('product')
+    const mycartCollection = client.db('productDB').collection('myCart')
 
     app.get('/product', async (req, res)=>{
       const cusor = productCollection.find();
@@ -46,7 +47,7 @@ async function run() {
       const result = await productCollection.insertOne(newProduct);
       res.send(result)
     })
-
+    
     app.put('/product/:id', async (req, res)=>{
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
@@ -68,6 +69,40 @@ async function run() {
       const result = await productCollection.updateOne(filter, product, options);
       res.send(result)
     })
+
+    // send data to my cart 
+
+    // create myCart api
+
+    app.get("/myCart", async (req, res)=>{
+      const cusor = mycartCollection.find();
+      const myCart = await cusor.toArray();
+      res.send(myCart)
+    })
+
+    app.get('/myCart/:id', async (req, res)=>{
+      const id = req.params.id;
+      const qurey = {_id: new ObjectId(id)};
+      const result = await productCollection.findOne(qurey);
+      res.send(result);
+  })
+
+    app.post('/myCart', async (req, res)=>{
+      const myCart = req.body;
+      console.log(myCart)
+      const result = await mycartCollection.insertOne(myCart);
+      res.send(result)
+    })
+
+    app.delete("/myCart/:id", async (req, res) =>{
+      const id = req.params.id;
+      console.log({id})
+      const qurey = {_id:(id)};
+      const result = await mycartCollection.deleteOne(qurey);
+      console.log(result)
+      res.send(result)
+    })
+
 
     
     // Send a ping to confirm a successful connection
